@@ -10,9 +10,9 @@ class App extends Component {
     super();
     this.state = {
       sushi: [],
-      balance: 10000,
-      sushiPointer: 0,
-      showUneaten: false,
+      balance: 500,
+      sushiPointer: 4,
+      displayedSushi: [],
     }
   }
 
@@ -21,13 +21,14 @@ class App extends Component {
     .then(sushi => sushi.map(this.addSushiData))
     .then(sushi => this.setState({
       sushi: sushi,
+      displayedSushi: sushi.slice(0, 4),
     }));
   }
 
   render() {
     return (
       <div className="app">
-        <SushiContainer sushi={this.getNextSushi()} eat={this.eatSushi} more={this.getMoreSushi} />
+        <SushiContainer sushi={this.state.displayedSushi} eat={this.eatSushi} more={this.getMoreSushi} />
         <Table balance={this.state.balance} plates={this.state.sushi.filter(this.eatenFilter) } />
       </div>
     );
@@ -37,39 +38,23 @@ class App extends Component {
   uneatenFilter = sushi => !sushi.eaten;
 
   getMoreSushi = () => {
+    let uneatenCount = this.state.sushi.filter(this.uneatenFilter).length;
+    let newSP = this.state.sushiPointer;
+    let newSushi = [];
+
+    for (let i = newSP; newSushi.length < uneatenCount && newSushi.length < 4; i = this.safeIncrement(i) ) {
+      if (!this.state.sushi[i].eaten) {
+        newSP = this.safeIncrement(i);
+        newSushi.push(this.state.sushi[i]);
+      }
+    }
     this.setState({
-      sushiPointer: this.safeAdd(this.state.sushiPointer, 4),
-      showUneaten: false,
+      sushiPointer: newSP,
+      displayedSushi: newSushi,
     })
   }
 
-  getNextSushi = () => {
-    if(this.state.showUneaten) {
-      this.setState({
-        showUneaten: true,
-      })
-    }
-    
-    let sp = this.state.sushiPointer;
-    let uneatenSushi = this.state.sushi.filter(this.uneatenFilter);
-    let returnedSushi = [];
-
-    if (uneatenSushi.length < 4) {
-      return uneatenSushi;
-    } else {
-      for (let i = sp; returnedSushi.length < 4; i = this.safeAdd(i)) {
-        if (!this.state.sushi[i].eaten) {
-          returnedSushi.push(this.state.sushi[i]);
-        }
-      }
-    }
-
-    return returnedSushi;
-  }
-
-  safeAdd = (i, n = 1) => {
-    return (i + n) % this.state.sushi.length;
-  }
+  safeIncrement = (i) => ++i % this.state.sushi.length;
 
   addSushiData = (sushi, index) => {
     sushi.eaten = false;
