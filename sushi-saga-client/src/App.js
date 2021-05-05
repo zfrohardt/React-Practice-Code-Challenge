@@ -28,7 +28,7 @@ export default class App extends Component {
   render() {
     return (
       <div className="app">
-        <SushiContainer sushi={this.state.displayedSushi} eat={this.eatSushi} more={this.getMoreSushi} />
+        <SushiContainer sushi={this.state.displayedSushi} eat={this.eatSushi} more={() => this.getMoreSushi()} />
         <Table balance={this.state.balance} plates={this.state.sushi.filter(sushi => sushi.eaten) } />
       </div>
     );
@@ -41,11 +41,13 @@ export default class App extends Component {
     let newSushi = [];
 
     for (let i = newSP; newSushi.length < uneatenCount && newSushi.length < n; i = this.safeIncrement(i) ) {
+      console.log("loop body")
       if (!this.state.sushi[i].eaten) {
         newSP = this.safeIncrement(i);
         newSushi.push(this.state.sushi[i]);
       }
     }
+    console.log(newSushi)
     this.setState({
       sushiPointer: newSP,
       displayedSushi: newSushi,
