@@ -10,7 +10,7 @@ export default class App extends Component {
     super();
     this.state = {
       sushi: [],
-      balance: 500,
+      balance: 100,
       sushiPointer: 4,
       displayedSushi: [],
     }
@@ -41,13 +41,11 @@ export default class App extends Component {
     let newSushi = [];
 
     for (let i = newSP; newSushi.length < uneatenCount && newSushi.length < n; i = this.safeIncrement(i) ) {
-      console.log("loop body")
       if (!this.state.sushi[i].eaten) {
         newSP = this.safeIncrement(i);
         newSushi.push(this.state.sushi[i]);
       }
     }
-    console.log(newSushi)
     this.setState({
       sushiPointer: newSP,
       displayedSushi: newSushi,
